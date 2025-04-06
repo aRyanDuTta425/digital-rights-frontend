@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { getLocalStorage, setLocalStorage, removeLocalStorage } from '@/utils/storage'
+import { api } from '@/api/config'
 
 interface User {
   id: string
@@ -26,26 +27,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = getLocalStorage('auth_token')
     if (token) {
-      // TODO: Validate token and get user info
-      setUser({
-        id: '1',
-        name: 'Test User',
-        email: 'test@example.com'
-      })
+      api.get('/auth/me')
+        .then(response => {
+          setUser(response.data)
+        })
+        .catch(() => {
+          removeLocalStorage('auth_token')
+        })
+        .finally(() => {
+          setIsLoading(false)
+        })
+    } else {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }, [])
 
   const login = async (email: string, password: string) => {
     try {
-      // TODO: Implement actual login API call
-      const token = 'dummy_token'
+      const response = await api.post('/auth/login', { email, password })
+      const { token, user } = response.data
       setLocalStorage('auth_token', token)
-      setUser({
-        id: '1',
-        name: 'Test User',
-        email: email
-      })
+      setUser(user)
     } catch (error) {
       throw new Error('Login failed')
     }
@@ -53,14 +55,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      // TODO: Implement actual registration API call
-      const token = 'dummy_token'
+      const response = await api.post('/auth/register', { name, email, password })
+      const { token, user } = response.data
       setLocalStorage('auth_token', token)
-      setUser({
-        id: '1',
-        name: name,
-        email: email
-      })
+      setUser(user)
     } catch (error) {
       throw new Error('Registration failed')
     }
