@@ -1,16 +1,18 @@
 import axios from 'axios'
 
 // Use the environment variable for API URL
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
 const getTokenWithExpiry = () => {
+  if (typeof window === 'undefined') return null
+  
   const token = localStorage.getItem('auth_token')
   const expiryStr = localStorage.getItem('auth_token_expiry')
   
@@ -43,8 +45,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token')
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   }
