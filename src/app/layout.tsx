@@ -1,13 +1,8 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
+import App from './App'
 
-const inter = Inter({ subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: 'Digital Rights Management',
-  description: 'Manage and protect your digital content',
-}
+const queryClient = new QueryClient()
 
 export default function RootLayout({
   children,
@@ -16,8 +11,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
+      <body>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <App>{children}</App>
+          </AuthProvider>
+        </QueryClientProvider>
       </body>
     </html>
   )
