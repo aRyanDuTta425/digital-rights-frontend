@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import Link from 'next/link'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -94,6 +95,15 @@ export default function RegisterPage() {
             >
               Register
             </button>
+          </div>
+
+          <div className="text-sm text-center">
+            <Link
+              href="/login"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Already have an account? Sign in
+            </Link>
           </div>
         </form>
       </div>
