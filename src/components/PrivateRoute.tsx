@@ -1,16 +1,20 @@
-import { Navigate, useLocation } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useAuth } from '@/hooks/useAuth'
 
-interface PrivateRouteProps {
-  children: React.ReactNode
-}
+export default function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth()
+  const router = useRouter()
 
-export default function PrivateRoute({ children }: PrivateRouteProps) {
-  const location = useLocation()
-  const token = localStorage.getItem('auth_token')
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/login')
+    }
+  }, [user, isLoading, router])
 
-  if (!token) {
-    return <Navigate to="/login" state={{ from: location }} replace />
+  if (isLoading) {
+    return <div>Loading...</div>
   }
 
-  return <>{children}</>
+  return user ? <>{children}</> : null
 } 
