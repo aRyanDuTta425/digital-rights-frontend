@@ -2,7 +2,9 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
+import ClientOnly from '@/components/ClientOnly'
 
 export default function DashboardPage() {
   const { user, isLoading } = useAuth()
@@ -16,8 +18,11 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
       </div>
     )
   }
@@ -27,43 +32,35 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
-        
-        <div className="bg-white shadow rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Welcome, {user.name}!</h2>
-          <p className="text-gray-600">Email: {user.email}</p>
-        </div>
+    <ClientOnly>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-0">
+            <div className="bg-white shadow rounded-lg p-6">
+              <h1 className="text-2xl font-semibold text-gray-900">Welcome, {user.name}!</h1>
+              <p className="mt-1 text-sm text-gray-500">{user.email}</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Content Check</h2>
-            <p className="text-gray-600 mb-4">
-              Analyze your content for potential copyright issues and get recommendations.
-            </p>
-            <a
-              href="/content-check"
-              className="inline-block bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90"
-            >
-              Start Check
-            </a>
-          </div>
+              <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <Link
+                  href="/content-check"
+                  className="block p-6 bg-white border rounded-lg hover:border-primary-500 transition-colors"
+                >
+                  <h2 className="text-xl font-semibold text-gray-900">Content Check</h2>
+                  <p className="mt-2 text-gray-600">Verify if your content has been used without permission</p>
+                </Link>
 
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Legal Chat</h2>
-            <p className="text-gray-600 mb-4">
-              Get instant answers to your legal questions about copyright and licensing.
-            </p>
-            <a
-              href="/chat"
-              className="inline-block bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90"
-            >
-              Start Chat
-            </a>
+                <Link
+                  href="/chat"
+                  className="block p-6 bg-white border rounded-lg hover:border-primary-500 transition-colors"
+                >
+                  <h2 className="text-xl font-semibold text-gray-900">Legal Chat</h2>
+                  <p className="mt-2 text-gray-600">Get instant legal advice about your digital rights</p>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ClientOnly>
   )
 } 
