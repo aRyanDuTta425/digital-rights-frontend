@@ -31,4 +31,7 @@ export function withClientOnly<P extends object>(
     ssr: false,
     loading: () => <>{fallback}</>,
   })
-} 
+}
+
+// Add default export
+export default ClientOnly 
