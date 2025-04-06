@@ -24,27 +24,6 @@ export const api = axios.create({
   },
 })
 
-const getTokenWithExpiry = () => {
-  if (typeof window === 'undefined') return null
-  
-  const token = localStorage.getItem('auth_token')
-  const expiryStr = localStorage.getItem('auth_token_expiry')
-  
-  if (!token || !expiryStr) {
-    return null
-  }
-
-  const expiryDate = new Date(expiryStr)
-  if (expiryDate < new Date()) {
-    // Token has expired
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('auth_token_expiry')
-    return null
-  }
-
-  return token
-}
-
 // Add a request interceptor
 api.interceptors.request.use(
   (config) => {
