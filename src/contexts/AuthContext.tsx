@@ -1,45 +1,23 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { api } from '@/api/config'
+import { getLocalStorage, setLocalStorage, removeLocalStorage } from '@/utils/storage'
 
 interface User {
   id: string
-  email: string
   name: string
-  avatar?: string
+  email: string
 }
 
 interface AuthContextType {
   user: User | null
-  isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<any>
-  register: (email: string, password: string, name: string) => Promise<any>
+  login: (email: string, password: string) => Promise<void>
+  register: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-// Helper function to safely access localStorage
-const getLocalStorage = (key: string): string | null => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem(key)
-  }
-  return null
-}
-
-const setLocalStorage = (key: string, value: string): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(key, value)
-  }
-}
-
-const removeLocalStorage = (key: string): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem(key)
-  }
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -48,35 +26,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = getLocalStorage('auth_token')
     if (token) {
-      api.get('/auth/me')
-        .then(response => {
-          setUser(response.data)
-        })
-        .catch(() => {
-          removeLocalStorage('auth_token')
-        })
-        .finally(() => {
-          setIsLoading(false)
-        })
-    } else {
-      setIsLoading(false)
+      // TODO: Validate token and get user info
+      setUser({
+        id: '1',
+        name: 'Test User',
+        email: 'test@example.com'
+      })
     }
+    setIsLoading(false)
   }, [])
 
   const login = async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password })
-    const { token, user } = response.data
-    setLocalStorage('auth_token', token)
-    setUser(user)
-    return response
+    try {
+      // TODO: Implement actual login API call
+      const token = 'dummy_token'
+      setLocalStorage('auth_token', token)
+      setUser({
+        id: '1',
+        name: 'Test User',
+        email: email
+      })
+    } catch (error) {
+      throw new Error('Login failed')
+    }
   }
 
-  const register = async (email: string, password: string, name: string) => {
-    const response = await api.post('/auth/register', { email, password, name })
-    const { token, user } = response.data
-    setLocalStorage('auth_token', token)
-    setUser(user)
-    return response
+  const register = async (name: string, email: string, password: string) => {
+    try {
+      // TODO: Implement actual registration API call
+      const token = 'dummy_token'
+      setLocalStorage('auth_token', token)
+      setUser({
+        id: '1',
+        name: name,
+        email: email
+      })
+    } catch (error) {
+      throw new Error('Registration failed')
+    }
   }
 
   const logout = () => {
@@ -85,16 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        register,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )

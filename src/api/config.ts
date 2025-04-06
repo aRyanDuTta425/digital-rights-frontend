@@ -1,23 +1,10 @@
 import axios from 'axios'
-
-// Helper function to safely access localStorage
-const getLocalStorage = (key: string): string | null => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem(key)
-  }
-  return null
-}
-
-const removeLocalStorage = (key: string): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem(key)
-  }
-}
+import { getLocalStorage, removeLocalStorage } from '@/utils/storage'
 
 // Use the environment variable for API URL
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
-export const api = axios.create({
+const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -50,4 +37,6 @@ api.interceptors.response.use(
     }
     return Promise.reject(error)
   }
-) 
+)
+
+export { api } 
