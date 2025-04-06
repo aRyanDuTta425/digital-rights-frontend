@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { login as loginApi, register as registerApi } from '@/api/auth'
+import { withClientOnly } from '@/components/ClientOnly'
 
 interface User {
   id: string
@@ -20,7 +21,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+function AuthProviderComponent({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -85,6 +86,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   )
 }
+
+// Export a client-only version of the AuthProvider
+export const AuthProvider = withClientOnly(AuthProviderComponent)
 
 export function useAuth() {
   const context = useContext(AuthContext)
