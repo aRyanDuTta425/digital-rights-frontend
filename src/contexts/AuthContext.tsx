@@ -1,8 +1,8 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { getLocalStorage, setLocalStorage, removeLocalStorage } from '@/utils/storage'
-import { api } from '@/api/config'
+import { useRouter } from 'next/navigation'
+import { login as loginApi, register as registerApi } from '@/api/auth'
 
 interface User {
   id: string
@@ -23,50 +23,60 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-    const token = getLocalStorage('auth_token')
-    if (token) {
-      api.get('/auth/me')
-        .then(response => {
-          setUser(response.data)
-        })
-        .catch(() => {
-          removeLocalStorage('auth_token')
-        })
-        .finally(() => {
-          setIsLoading(false)
-        })
-    } else {
+    // Check if we're in the browser environment
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser))
+        } catch (error) {
+          console.error('Error parsing stored user:', error)
+          localStorage.removeItem('user')
+        }
+      }
       setIsLoading(false)
     }
   }, [])
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await api.post('/auth/login', { email, password })
-      const { token, user } = response.data
-      setLocalStorage('auth_token', token)
-      setUser(user)
+      const response = await loginApi(email, password)
+      const userData = response.data.user
+      setUser(userData)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(userData))
+      }
+      router.push('/dashboard')
     } catch (error) {
-      throw new Error('Login failed')
+      console.error('Login error:', error)
+      throw error
     }
   }
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await api.post('/auth/register', { name, email, password })
-      const { token, user } = response.data
-      setLocalStorage('auth_token', token)
-      setUser(user)
+      const response = await registerApi(name, email, password)
+      const userData = response.data.user
+      setUser(userData)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(userData))
+      }
+      router.push('/dashboard')
     } catch (error) {
-      throw new Error('Registration failed')
+      console.error('Registration error:', error)
+      throw error
     }
   }
 
   const logout = () => {
-    removeLocalStorage('auth_token')
     setUser(null)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user')
+    }
+    router.push('/login')
   }
 
   return (
