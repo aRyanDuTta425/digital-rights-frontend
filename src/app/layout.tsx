@@ -1,6 +1,11 @@
+'use client'
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from '@/contexts/AuthContext'
-import App from './App'
+import { ThemeProvider } from '@/components/theme-provider'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import { Toaster } from '@/components/ui/toaster'
 
 const queryClient = new QueryClient()
 
@@ -14,7 +19,16 @@ export default function RootLayout({
       <body>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <App>{children}</App>
+            <ThemeProvider defaultTheme="system" storageKey="digital-rights-theme">
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-grow">
+                  {children}
+                </main>
+                <Footer />
+                <Toaster />
+              </div>
+            </ThemeProvider>
           </AuthProvider>
         </QueryClientProvider>
       </body>

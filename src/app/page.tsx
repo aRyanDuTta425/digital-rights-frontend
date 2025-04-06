@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export default function HomePage() {
   return (
@@ -13,24 +13,24 @@ export default function HomePage() {
           <p className="text-gray-600 mb-4">
             Analyze your content for potential copyright issues and get recommendations.
           </p>
-          <a
+          <Link
             href="/check"
             className="inline-block bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
           >
             Check Content
-          </a>
+          </Link>
         </div>
         <div className="p-6 border rounded-lg">
           <h2 className="text-2xl font-semibold mb-4">Legal Chat</h2>
           <p className="text-gray-600 mb-4">
             Get instant answers to your legal questions about copyright and licensing.
           </p>
-          <a
+          <Link
             href="/chat"
             className="inline-block bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
           >
             Start Chat
-          </a>
+          </Link>
         </div>
       </div>
     </main>
